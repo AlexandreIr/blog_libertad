@@ -3,6 +3,7 @@ package br.com.libertadfacilities.blog.services;
 import br.com.libertadfacilities.blog.model.User;
 import br.com.libertadfacilities.blog.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
     public User createUser(User user){
         if(userRepository.existsByEmail(user.getEmail())) {
@@ -17,6 +19,7 @@ public class UserService {
         }
 
         //TODO definir contrato de criptografia da senha do usuário
+        user.setPassword(encoder.encode(user.getPassword()));
 
         return userRepository.save(user);
     }
