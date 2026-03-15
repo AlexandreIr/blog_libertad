@@ -1,5 +1,6 @@
 package br.com.libertadfacilities.blog.services;
 
+import br.com.libertadfacilities.blog.exception.BusinessRuleException;
 import br.com.libertadfacilities.blog.model.Category;
 import br.com.libertadfacilities.blog.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class CategoryService {
     public Category createCategory(Category category) {
 
         if (categoryRepository.existsByName(category.getName())) {
-            throw new RuntimeException("Uma categoria com este nome já existe.");
+            throw new BusinessRuleException("Uma categoria com este nome já existe.");
         }
 
         return categoryRepository.save(category);

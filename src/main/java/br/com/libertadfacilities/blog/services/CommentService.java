@@ -1,5 +1,6 @@
 package br.com.libertadfacilities.blog.services;
 
+import br.com.libertadfacilities.blog.exception.ResourceNotFoundException;
 import br.com.libertadfacilities.blog.model.Comment;
 import br.com.libertadfacilities.blog.model.Post;
 import br.com.libertadfacilities.blog.repositories.CommentRepository;
@@ -19,7 +20,7 @@ public class CommentService {
     public Comment addComment(Long postId, Comment comment){
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new RuntimeException("Post não encontrado."));
+                .orElseThrow(()-> new ResourceNotFoundException("Post não encontrado."));
 
         comment.setPost(post);
 
