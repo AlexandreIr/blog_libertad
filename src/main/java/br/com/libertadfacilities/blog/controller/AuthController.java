@@ -5,6 +5,7 @@ import br.com.libertadfacilities.blog.dto.AuthResponse;
 import br.com.libertadfacilities.blog.model.User;
 import br.com.libertadfacilities.blog.security.JwtUtil;
 import br.com.libertadfacilities.blog.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,13 +28,13 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user){
-        User newUser = userService.createUser(user);
+    public ResponseEntity<Long> register(@RequestBody User user){
+        Long newUser = userService.createUser(user);
         return ResponseEntity.ok(newUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
