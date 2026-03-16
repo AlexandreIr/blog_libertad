@@ -17,14 +17,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
@@ -60,5 +57,31 @@ public class PostService {
     public Page<Post> getPostsByCategory(Long categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return postRepository.findByCategoryId(categoryId, pageable);
+    }
+
+    public void deletePost(Long postId, String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado."));
+        Post post = postRepository.findById(postId)
+                        .orElseThrow(()-> new ResourceNotFoundException("Post não encontrado."));
+        if(!post.getAuthor().equals(user)) {
+            throw new BusinessRuleException("Usuário não pode apagar post de outro usuário.");
+        }
+        postRepository.deleteById(postId);
+    }
+
+    public Page<Post> searchPosts(String keyword, int page, int size,
+                                  String sortBy, String sortDirection){
+        Sort.Direction direction = sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(direction, sortBy);
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if(keyword == null || keyword.trim().isBlank()) {
+            return postRepository.findAll(pageable);
+        }
+
+        return postRepository.searchPosts(keyword, pageable);
     }
 }

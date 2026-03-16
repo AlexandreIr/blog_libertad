@@ -3,6 +3,7 @@ package br.com.libertadfacilities.blog.controller;
 import br.com.libertadfacilities.blog.dto.PostRequestDTO;
 import br.com.libertadfacilities.blog.model.Post;
 import br.com.libertadfacilities.blog.services.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -25,7 +26,7 @@ public class PostController {
             @ModelAttribute PostRequestDTO request
     ){
 
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         Post post = new Post();
         post.setTitle(request.getTitle());
@@ -50,5 +51,23 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ){
         return ResponseEntity.ok(postService.getPostsByCategory(categoryId, page, size));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Post>> searchPosts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ){
+        return ResponseEntity.ok(postService.searchPosts(keyword, page, size, sortBy, sortDirection));
+    }
+
+    @DeleteMapping("{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, HttpServletRequest request){
+        String userEmail = request.getUserPrincipal().getName();
+        postService.deletePost(postId, userEmail);
+        return ResponseEntity.noContent().build();
     }
 }
