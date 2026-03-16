@@ -27,7 +27,25 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> getCommentsByPost(Long postId){
-        return commentRepository.findByPostId(postId);
+    public List<Comment> getApprovedCommentsByPost(Long postId) {
+        return commentRepository.findByPostIdAndApprovedTrue(postId);
+    }
+
+    public List<Comment> getPendingComments() {
+        return commentRepository.findByApprovedFalse();
+    }
+
+    public Comment approveComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado."));
+
+        comment.setApproved(true);
+        return commentRepository.save(comment);
+    }
+
+    public void rejectComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado."));
+        commentRepository.delete(comment);
     }
 }

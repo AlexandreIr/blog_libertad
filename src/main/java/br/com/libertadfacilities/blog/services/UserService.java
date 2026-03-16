@@ -1,13 +1,14 @@
 package br.com.libertadfacilities.blog.services;
 
 import br.com.libertadfacilities.blog.exception.BusinessRuleException;
-import br.com.libertadfacilities.blog.exception.ResourceNotFoundException;
 import br.com.libertadfacilities.blog.model.User;
 import br.com.libertadfacilities.blog.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
